@@ -3,6 +3,7 @@ package user
 import (
 	"log"
 
+	"github.com/Ayobami6/pickitup/models"
 	"gorm.io/gorm"
 )
 
@@ -12,7 +13,7 @@ type userRepoImpl struct {
 
 
 func NewUserRepoImpl(db *gorm.DB) *userRepoImpl {
-	err := db.AutoMigrate(&User{})
+	err := db.AutoMigrate(&models.User{})
 	if err!= nil {
         log.Fatal(err)
     }
@@ -20,7 +21,7 @@ func NewUserRepoImpl(db *gorm.DB) *userRepoImpl {
 }
 
 
-func (r *userRepoImpl) CreateUser(user *User) error {
+func (r *userRepoImpl) CreateUser(user *models.User) error {
 	res := r.db.Create(user)
 	if res.Error != nil {
 		return res.Error
@@ -28,8 +29,8 @@ func (r *userRepoImpl) CreateUser(user *User) error {
 	return nil
 }
 
-func (r *userRepoImpl) GetUserByEmail(email string) (*User, error) {
-	result := &User{}
+func (r *userRepoImpl) GetUserByEmail(email string) (*models.User, error) {
+	result := &models.User{}
 	err := r.db.Where("email =?", email).First(&result).Error
 	if err != nil {
 		return nil, err

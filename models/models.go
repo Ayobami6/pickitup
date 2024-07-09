@@ -1,4 +1,4 @@
-package rider
+package models
 
 import (
 	"crypto/rand"
@@ -6,6 +6,20 @@ import (
 
 	"gorm.io/gorm"
 )
+
+type User struct {
+	gorm.Model
+	ID        uint   `json:"id" gorm:"primaryKey"`
+	UserName string `json:"username"`
+	Email string `json:"email required" gorm:"unique"`
+	PhoneNumber string `json:"phoneNumber" gorm:"unique"`
+	WalletBalance string `json:"walletBalance"`
+	AccountNumber string `json:"accountNumber" gorm:""`
+	AccountName string `json:"accountName"`
+	Password string `json:"password"`
+	Verified bool `json:"verified" gorm:"default:false"`
+	Rider      Rider      `gorm:"foreignKey:UserID"`
+}
 
 type Rider struct {
 	gorm.Model
@@ -23,7 +37,7 @@ type Rider struct {
 	Rating float64  `json:"rating"`
 	Level string  `json:"level"`
 	CurrentLocation string `json:"current_location"`
-	Review []Review `json:"reviews" gorm:"references:reviews"`
+	Reviews  []Review `json:"reviews" gorm:"foreignKey:RiderID"`
 }
 
 

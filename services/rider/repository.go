@@ -3,6 +3,7 @@ package rider
 import (
 	"log"
 
+	"github.com/Ayobami6/pickitup/models"
 	"gorm.io/gorm"
 )
 
@@ -11,7 +12,7 @@ type riderRepositoryImpl struct {
 }
 
 func NewRiderRepositoryImpl(db *gorm.DB) *riderRepositoryImpl {
-	err := db.AutoMigrate(&Rider{})
+	err := db.AutoMigrate(&models.Rider{}, &models.Review{})
 	if err!= nil {
         log.Fatal(err)
     }
@@ -20,6 +21,6 @@ func NewRiderRepositoryImpl(db *gorm.DB) *riderRepositoryImpl {
 
 // overide the interface methods
 
-func (r *riderRepositoryImpl) CreateRider(rider *Rider) error {
+func (r *riderRepositoryImpl) CreateRider(rider *models.Rider) error {
     return r.db.Create(rider).Error
 }

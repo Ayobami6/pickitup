@@ -34,12 +34,12 @@ func (a *APIServer) Run() error {
 	rootHandler := root.NewRootHandler()
 	rootHandler.RegisterRoutes(subrouter)
 	userRepo := user.NewUserRepoImpl(a.db)
-	userHandler := user.NewUserHandler(*userRepo)
+	userHandler := user.NewUserHandler(userRepo)
 	userHandler.RegisterRoutes(subrouter)
 	// rider stuffs
 	riderRepo := rider.NewRiderRepositoryImpl(a.db)
 	// instantiate the rider handler
-	riderHandler := rider.NewRiderHandler(*riderRepo)
+	riderHandler := rider.NewRiderHandler(riderRepo)
     // register the rider routes
     riderHandler.RegisterRoutes(subrouter)
 

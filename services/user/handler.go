@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Ayobami6/pickitup/config"
+	"github.com/Ayobami6/pickitup/models"
 	"github.com/Ayobami6/pickitup/services/auth"
 	"github.com/Ayobami6/pickitup/services/user/dto"
 	"github.com/Ayobami6/pickitup/utils"
@@ -15,10 +16,10 @@ import (
 )
 
 type userHandler struct {
-	repo userRepoImpl
+	repo models.UserRepo
 }
 
-func NewUserHandler(repo userRepoImpl) *userHandler {
+func NewUserHandler(repo models.UserRepo) *userHandler {
 	return &userHandler{repo: repo}
 }
 
@@ -63,7 +64,7 @@ func (h *userHandler) handleRegister(w http.ResponseWriter, r *http.Request) {
     }
 	
 	// create user with the new hashed password
-	newErr := h.repo.CreateUser(&User{
+	newErr := h.repo.CreateUser(&models.User{
 		UserName: payload.UserName,
 		Password: hashedPassword,
 		Email: payload.Email,
