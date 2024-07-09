@@ -4,7 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
+
+var Validate = validator.New()
 
 func WriteJSON(w http.ResponseWriter, status int, status_msg, data any, others ...string) error {
 	message := ""

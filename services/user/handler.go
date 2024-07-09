@@ -7,6 +7,7 @@ import (
 	"github.com/Ayobami6/pickitup/services/auth"
 	"github.com/Ayobami6/pickitup/services/user/dto"
 	"github.com/Ayobami6/pickitup/utils"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
@@ -29,6 +30,19 @@ func (h *userHandler) handleRegister(w http.ResponseWriter, r *http.Request) {
         utils.WriteError(w, http.StatusBadRequest, "Invalid Payload")
         return
     }
+	// validate
+	if vErr := utils.Validate.Struct(payload); vErr != nil {
+		errs := vErr.(validator.ValidationErrors)
+		if strings.Contains(errs.Error(), "Email") {
+			utils.WriteError(w, http.StatusBadRequest, "Invalid Email Format")
+            return
+		} else if strings.Contains(errs.Error(), "Password") {
+			utils.WriteError(w, http.StatusBadRequest, "Password Too Weak")
+            return
+		}
+		utils.WriteError(w, http.StatusBadRequest, "Bad Data!")
+		return
+	}
 	email := payload.Email
 
 	_, errr := h.repo.GetUserByEmail(email)
