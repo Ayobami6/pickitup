@@ -1,9 +1,12 @@
 package user
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
+	"github.com/Ayobami6/pickitup/config"
 	"github.com/Ayobami6/pickitup/services/auth"
 	"github.com/Ayobami6/pickitup/services/user/dto"
 	"github.com/Ayobami6/pickitup/utils"
@@ -21,6 +24,7 @@ func NewUserHandler(repo userRepoImpl) *userHandler {
 
 func (h *userHandler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/register", h.handleRegister).Methods("POST")
+	router.HandleFunc("/login", h.handleLogin).Methods("POST")
 }
 
 func (h *userHandler) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +61,7 @@ func (h *userHandler) handleRegister(w http.ResponseWriter, r *http.Request) {
         utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
         return
     }
-
+	
 	// create user with the new hashed password
 	newErr := h.repo.CreateUser(&User{
 		UserName: payload.UserName,
@@ -74,9 +78,53 @@ func (h *userHandler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
         return
     }
+	// genarate and cache random number
+	num, err := utils.GenerateAndCacheVerificationCode(payload.Email)
+	if err!= nil {
+        log.Println("Generate Code Failed: ", err)
+    } else {
+		// send the email to verify
+		msg := fmt.Sprintf("Your verification code is %d\n", num)
+		err = utils.SendMail(payload.Email, "Email Verification", payload.UserName, msg)
+        if err!= nil {
+            log.Printf("Email sending failed due to %v\n", err)
+        }
+	}
 
 	utils.WriteJSON(w, http.StatusCreated, "success", nil, "User Successfully Created!")
 
+}
 
+func (h *userHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
+	var payload dto.LoginDTO
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, "Invalid Login Credentials")
+		return
+	}
+	// validate the payload
+	if err := utils.Validate.Struct(payload); err != nil {
+		err := err.(validator.ValidationErrors)
+		if strings.Contains(err.Error(), "Email") {
+			utils.WriteError(w, http.StatusBadRequest, "Invalid email address")
+			return
+		}
+	}
+	u, err := h.repo.GetUserByEmail(payload.Email)
+	if err != nil {
+		utils.WriteError(w, http.StatusUnauthorized, "Invalid email address or password")
+		return
+	}
+	// check password
 
+	if !auth.CheckPassword(u.Password, []byte(payload.Password)) {
+		utils.WriteError(w, http.StatusUnauthorized, "Invalid password")
+		return
+	}
+	secret := []byte(config.GetEnv("JWT_SECRET", "secret"))
+	token, err := auth.CreateJWT(secret, int(u.ID))
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "It from us!")
+		return
+	}
+	utils.WriteJSON(w, http.StatusOK, "login Successful", map[string]string{"token": token})
 }

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PickItUp Email Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding: 10px;
+            text-align: center;
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        h1 {
+            color: #007BFF;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PickItUp</h1>
+        </div>
+        <div class="content">
+            <h2>Hello, {{.UserName}}!</h2>
+            <p>{{.Message}}</p>
+            <a href="#" class="button">Call to Action</a>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Company Name. All rights reserved.</p>
+            <p>1234 Abraham Adesanya Ajah, Lagos</p>
+        </div>
+    </div>
+</body>
+
+</html>
