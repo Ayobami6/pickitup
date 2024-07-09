@@ -1,6 +1,9 @@
 package user
 
-import "gorm.io/gorm"
+import (
+	"github.com/Ayobami6/pickitup/services/rider"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -12,4 +15,6 @@ type User struct {
 	AccountNumber string `json:"accountNumber" gorm:""`
 	AccountName string `json:"accountName"`
 	Password string `json:"password"`
+	Verified bool `json:"verified" gorm:"default:false"`
+	Rider      rider.Rider      `gorm:"foreignKey:UserID"`
 }

@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/Ayobami6/pickitup/config"
-	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/go-playground/validator/v10"
 	"github.com/go-redis/redis/v8"
 	"gopkg.in/gomail.v2"
@@ -23,7 +22,6 @@ var rdb *redis.Client
 var ctx = context.Background()
 
 var Validate = validator.New()
-var mc *memcache.Client
 
 func init() {
 	rdb = redis.NewClient(&redis.Options{
