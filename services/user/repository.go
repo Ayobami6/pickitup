@@ -22,7 +22,7 @@ func NewUserRepoImpl(db *gorm.DB) *userRepoImpl {
 
 
 func (r *userRepoImpl) CreateUser(user *models.User) error {
-	res := r.db.Create(user)
+	res := r.db.Create(&user)
 	if res.Error != nil {
 		return res.Error
 	}

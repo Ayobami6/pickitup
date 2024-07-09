@@ -39,7 +39,7 @@ func (a *APIServer) Run() error {
 	// rider stuffs
 	riderRepo := rider.NewRiderRepositoryImpl(a.db)
 	// instantiate the rider handler
-	riderHandler := rider.NewRiderHandler(riderRepo)
+	riderHandler := rider.NewRiderHandler(riderRepo, userRepo)
     // register the rider routes
     riderHandler.RegisterRoutes(subrouter)
 

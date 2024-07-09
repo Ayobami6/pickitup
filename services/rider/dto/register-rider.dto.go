@@ -10,6 +10,7 @@ type RegisterRiderDTO struct {
 	DriverLicenseNumber string `json:"driver_license_number" validate:"required"`
 	BikeNumber          string `json:"bike_number" validate:"required"`
 	Address             string `json:"address" validate:"required"`
-	UserName            string `json:"user_name" validate:"required"`
+	UserName            string `json:"username" validate:"required"`
 	Password            string `json:"password" validate:"required,min=6,alphanumunicode"`
+	PhoneNumber         string `json:"phone_number" validate:"required"`
 }

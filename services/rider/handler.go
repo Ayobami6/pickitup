@@ -1,10 +1,13 @@
 package rider
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/Ayobami6/pickitup/models"
+	"github.com/Ayobami6/pickitup/services/auth"
 	"github.com/Ayobami6/pickitup/services/rider/dto"
 	"github.com/Ayobami6/pickitup/utils"
 	"github.com/go-playground/validator/v10"
@@ -16,8 +19,8 @@ type riderHandler struct {
 	userRepo models.UserRepo
 }
 
-func NewRiderHandler(repo models.RiderRepository) *riderHandler {
-	return &riderHandler{repo: repo}
+func NewRiderHandler(repo models.RiderRepository, userRepo models.UserRepo) *riderHandler {
+	return &riderHandler{repo: repo, userRepo: userRepo}
 }
 
 func (h *riderHandler) RegisterRoutes(router *mux.Router) {
@@ -34,19 +37,84 @@ func(h *riderHandler) handleRegisterRider(w http.ResponseWriter, r *http.Request
     }
 
 	// validate
-	if vErr := utils.Validate.Struct(payload); vErr!= nil {
-        errs := vErr.(validator.ValidationErrors)
-        if strings.Contains(errs.Error(), "Email") {
-            utils.WriteError(w, http.StatusBadRequest, "Invalid Email Address")
+	if vErr := utils.Validate.Struct(payload); vErr != nil {
+		errs := vErr.(validator.ValidationErrors)
+		if strings.Contains(errs.Error(), "Email") {
+			utils.WriteError(w, http.StatusBadRequest, "Invalid Email Format")
+            return
+		} else if strings.Contains(errs.Error(), "Password") {
+			utils.WriteError(w, http.StatusBadRequest, "Password Too Weak")
+            return
+		}
+		log.Println(errs.Error())
+		utils.WriteError(w, http.StatusBadRequest, "Bad Data!")
+		return
+	}
+	password := payload.Password
+	hashedPassword, err := auth.HashPassword(password)
+	if err!= nil {
+        utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
+        return
+    }
+
+	user := &models.User{
+		UserName: payload.UserName,
+		Password: hashedPassword,
+		Email: payload.Email,
+		PhoneNumber: payload.PhoneNumber,
+	}
+	if h.userRepo == nil {
+		log.Println("User Repository not provided")
+		utils.WriteError(w, http.StatusInternalServerError, "User Repository not provided")
+        return
+    }
+
+	newErr := h.userRepo.CreateUser(user)
+
+	if newErr != nil {
+		log.Println("Got Here")
+		err := newErr.Error()
+		if strings.Contains(err, "uni_users_phone_number") {
+			utils.WriteError(w, http.StatusConflict, "User with this phone number already exists")
+            return
+		} else if strings.Contains(err, "uni_users_email") {
+			utils.WriteError(w, http.StatusConflict, "User with this email already exists")
+            return
+		}
+		utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
+        return
+    }
+	// create Rider
+	rider := models.Rider{
+        UserID: user.ID,
+        FirstName: payload.FirstName,
+		LastName: payload.LastName,
+        Address: payload.Address,
+        NextOfKinName: payload.NextOfKinName,
+		NextOfKinPhone: payload.NextOfKinPhone,
+        DriverLicenseNumber: payload.DriverLicenseNumber,
+        NextOfKinAddress: payload.NextOfKinAddress,
+		BikeNumber: payload.BikeNumber,
+    }
+
+    err = h.repo.CreateRider(&rider)
+    if err!= nil {
+        utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
+        return
+    }
+	// send verfication code
+	num, err := utils.GenerateAndCacheVerificationCode(payload.Email)
+    if err!= nil {
+        log.Println("Generate Code Failed: ", err)
+    } else {
+        // send the email to verify
+        msg := fmt.Sprintf("Your verification code is %d\n", num)
+        err = utils.SendMail(payload.Email, "Email Verification", payload.UserName, msg)
+        if err!= nil {
+            utils.WriteError(w, http.StatusInternalServerError, "Failed to send verification email")
             return
         }
     }
 
-    // create rider
-    
-    // TODO: add authentication and authorization for rider registration.
-    // TODO: add password hashing and salting for security.
-    // TODO: add email verification.
-    // TODO: add phone number verification.
-    // TODO: add address validation.
+    utils.WriteJSON(w, http.StatusCreated, "success", nil, "Rider Successfully Created!")
 }
