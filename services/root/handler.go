@@ -20,13 +20,12 @@ func (r *RootHandler) RegisterRoutes(router *mux.Router) {
 
 func (r *RootHandler) handleRoot(w http.ResponseWriter, _ *http.Request) {
 	data := map[string]string{
-		"status":  "success",
 		"message": "Welcome to PickItUp API V1!",
 		"version": "1.0.0",
 		"author": "Ayobami Alaran",
 		"github":  "https://github.com/Ayobami6/pickitup",
 	}
-	if err := utils.WriteJSON(w, http.StatusOK, data); err != nil {
-		utils.WriteError(w, http.StatusInternalServerError, err)
+	if err := utils.WriteJSON(w, http.StatusOK, "success", data); err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
 	}
 }

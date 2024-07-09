@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Ayobami6/pickitup/services/root"
+	"github.com/Ayobami6/pickitup/services/user"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
@@ -31,6 +32,9 @@ func (a *APIServer) Run() error {
 	subrouter := router.PathPrefix("/api/v1").Subrouter()
 	rootHandler := root.NewRootHandler()
 	rootHandler.RegisterRoutes(subrouter)
+	userRepo := user.NewUserRepoImpl(a.db)
+	userHandler := user.NewUserHandler(*userRepo)
+	userHandler.RegisterRoutes(subrouter)
 
 	log.Println("Server is running on :", a.addr)
 
