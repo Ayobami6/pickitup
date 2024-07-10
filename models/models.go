@@ -14,6 +14,15 @@ type StatusType string
 
 type PaymentStatus string
 
+type RiderAvailabilityStatus string
+
+const (
+	Available RiderAvailabilityStatus = "Available"
+    Unavailable RiderAvailabilityStatus = "Unavailable"
+    OnBreak RiderAvailabilityStatus = "On Break"
+	Busy RiderAvailabilityStatus = "Busy"
+)
+
 const (
 	Paid PaymentStatus = "Paid"
 	Unpaid PaymentStatus = "Unpaid"
@@ -27,18 +36,24 @@ const (
 )
 
 type User struct {
-	gorm.Model
 	ID        uint   `json:"id" gorm:"primaryKey"`
 	UserName string `json:"username"`
 	Email string `json:"email required" gorm:"unique"`
 	PhoneNumber string `json:"phoneNumber" gorm:"unique"`
-	WalletBalance string `json:"walletBalance"`
+	WalletBalance float64 `json:"walletBalance"`
 	AccountNumber string `json:"accountNumber" gorm:""`
 	AccountName string `json:"accountName"`
 	Password string `json:"password"`
 	Verified bool `json:"verified" gorm:"default:false"`
 	Rider      Rider      `gorm:"foreignKey:UserID"`
 	Orders 	[]Order `json:"orders" gorm:"foreignKey:UserID"`
+}
+
+func (u *User) Debit(tx *gorm.DB, amount float64) error  {
+	// Debit user wallet balance and save user again
+	u.WalletBalance = u.WalletBalance - amount
+    return tx.Save(u).Error
+
 }
 
 type Rider struct {
@@ -64,6 +79,7 @@ type Rider struct {
 	// add minimum and maximum charge to this
 	MinimumCharge float64 `json:"minimum_charge"`
 	MaximumCharge float64 `json:"maximum_charge"`
+	AvailabilityStatus RiderAvailabilityStatus `json:"availability_status" gorm:"default:Available"`
 }
 
 func (u *Rider) BeforeCreate(tx *gorm.DB) (err error) {
@@ -85,7 +101,7 @@ type Order struct {
 	ID uint `json:"id"`
 	RiderID uint `json:"rider_id"`
 	UserID uint `json:"user_id"`
-	RefID string `json:"ref_id" gorm:"uniqueIndex;size:10"`
+	RefID string `json:"ref_id" gorm:"uniqueIndex;size:30"`
 	Status StatusType `json:"status" gorm:"default:Pending"`
 	Item string `json:"item"`
 	Quantity int `json:"quantity"`
@@ -99,9 +115,11 @@ type Order struct {
 }
 
 func(u *Order) BeforeSave(tx *gorm.DB) error {
+	u.Status = Pending
 	if u.Status != Delivered && u.Status != Canceled && u.Status != Pending && u.Status != InDelivery {
 		return fmt.Errorf("invalid status")
 	}
+	u.PaymentStatus = Unpaid
 	if u.PaymentStatus != Paid && u.PaymentStatus != Unpaid {
 		return fmt.Errorf("invalid payment status")
 	}
@@ -130,7 +148,6 @@ func (o *Order) BeforeUpdate(tx *gorm.DB) (err error) {
 
 
 type Review struct {
-	gorm.Model
 	ID		uint `json:"id"`
 	RiderID uint `json:"rider_id"`
 	Rating float64 `json:"rating"`

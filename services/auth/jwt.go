@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -25,7 +26,7 @@ func CreateJWT(secret []byte, userId int) (string, error) {
 	}
 	expiration := time.Second * time.Duration(exp)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID": strconv.Itoa(userId),
+		"UserID": strconv.Itoa(userId),
 		"expiredAt": time.Now().Add(expiration).Unix(),
 	})
 	tokenStr, err := token.SignedString(secret)
@@ -51,31 +52,41 @@ func Auth(handlerFunc http.HandlerFunc, userStore models.UserRepo) http.HandlerF
             return []byte(config.GetEnv("JWT_SECRET", "")), nil
         })
         if err!= nil ||!token.Valid {
-            forbidden(w)
+            Forbidden(w)
             return
         }
         // get claims from jwt
-		claims := token.Claims.(jwt.MapClaims)
-		userID, err := strconv.Atoi(claims["userID"].(string))
-		if err!= nil {
-            forbidden(w)
+		claims, ok := token.Claims.(*jwt.MapClaims)
+		if !ok {
+			Forbidden(w)
+			return
+		}
+		userIDStr, ok := (*claims)["UserID"].(string)
+		if!ok {
+            Forbidden(w)
             return
         }
+		userID, err := strconv.Atoi(userIDStr)
+		if err!= nil {
+            Forbidden(w)
+            return
+        }
+		log.Println(userID)
 		// verify user from the database
-		user, err := userStore.GetUserByID(userID)
+		_, err = userStore.GetUserByID(userID)
         if err!= nil {
-            forbidden(w)
+            Forbidden(w)
             return
         }
         // set user as context value
-        ctx := context.WithValue(r.Context(), UserKey, user.ID)
+        ctx := context.WithValue(r.Context(), UserKey, userID)
         // call the original handler with the updated context
         handlerFunc(w, r.WithContext(ctx))
 
 	}
 }
 
-func forbidden(w http.ResponseWriter) {
+func Forbidden(w http.ResponseWriter) {
 	utils.WriteError(w, http.StatusForbidden, "Unauthorized",)
 }
 

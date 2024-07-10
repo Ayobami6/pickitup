@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -82,6 +83,7 @@ func WriteJSON(w http.ResponseWriter, status int, status_msg, data any, others .
 
 
 func WriteError(w http.ResponseWriter, status int, err string) {
+	log.Println(err)
     WriteJSON(w, status, "error", nil, err)
 }
 
