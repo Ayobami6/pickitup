@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/Ayobami6/pickitup/models"
@@ -25,6 +26,8 @@ func NewRiderHandler(repo models.RiderRepository, userRepo models.UserRepo) *rid
 
 func (h *riderHandler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/register/rider", h.handleRegisterRider).Methods("POST")
+	router.HandleFunc("/riders", h.handleGetRiders).Methods("GET")
+	router.HandleFunc("/riders/{id}", h.handleGetRider).Methods("GET")
 
 }
 
@@ -117,4 +120,27 @@ func(h *riderHandler) handleRegisterRider(w http.ResponseWriter, r *http.Request
     }
 
     utils.WriteJSON(w, http.StatusCreated, "success", nil, "Rider Successfully Created!")
+}
+
+func (h *riderHandler) handleGetRiders(w http.ResponseWriter, r *http.Request) {
+	riders, err := h.repo.GetRiders()
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
+	}
+	utils.WriteJSON(w, http.StatusOK, "success", riders)
+}
+
+func (h *riderHandler) handleGetRider(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+    id := vars["id"]
+	rider_id, err := strconv.Atoi(id)
+	if err!= nil {
+        utils.WriteError(w, http.StatusBadRequest, "Invalid ID")
+        return
+    }
+    rider, err := h.repo.GetRider(rider_id)
+    if err!= nil {
+        utils.WriteError(w, http.StatusNotFound, "Rider not found")
+    }
+    utils.WriteJSON(w, http.StatusOK, "success", rider, "Rider Fetch Successfully")
 }
