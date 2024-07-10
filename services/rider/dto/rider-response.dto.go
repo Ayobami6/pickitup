@@ -11,6 +11,7 @@ type RiderListResponse struct {
 	SuccessfulRides int64   `json:"successful_rides"`
 	Level           string  `json:"level"`
 	CurrentLocation string  `json:"current_location"`
+	SelfUrl         string  `json:"self_url"`
 }
 
 type RiderResponse struct {
@@ -25,5 +26,6 @@ type RiderResponse struct {
 	Level           string  `json:"level"`
 	CurrentLocation string  `json:"current_location"`
 	CreatedAt       string  `json:"created_at"`
+	SelfUrl         string  `json:"self_url"`
 	// Reviews         []ReviewResponse `json:"reviews"`
 }

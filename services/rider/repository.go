@@ -1,7 +1,9 @@
 package rider
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/Ayobami6/pickitup/models"
 	"github.com/Ayobami6/pickitup/services/rider/dto"
@@ -26,7 +28,7 @@ func (r *riderRepositoryImpl) CreateRider(rider *models.Rider) error {
     return r.db.Create(rider).Error
 }
 
-func (r *riderRepositoryImpl) GetRiders() (rider []dto.RiderListResponse, err error) {
+func (r *riderRepositoryImpl) GetRiders(req *http.Request) (rider []dto.RiderListResponse, err error) {
 	riders := []models.Rider{}
 	var parsedRiders []dto.RiderListResponse
 
@@ -34,6 +36,7 @@ func (r *riderRepositoryImpl) GetRiders() (rider []dto.RiderListResponse, err er
 	if res.Error!= nil {
         return nil, res.Error
     }
+	domain := getDomainURL(req)
 	for i := range riders {
 		rider := dto.RiderListResponse{
 			ID: riders[i].ID,
@@ -46,6 +49,7 @@ func (r *riderRepositoryImpl) GetRiders() (rider []dto.RiderListResponse, err er
 			Rating: riders[i].Rating,
 			CurrentLocation: riders[i].CurrentLocation,
 			Level: riders[i].Level,
+			SelfUrl: fmt.Sprintf("%s/riders/%d", domain, riders[i].ID),
 		}
 		parsedRiders = append(parsedRiders, rider)
 		
@@ -54,13 +58,28 @@ func (r *riderRepositoryImpl) GetRiders() (rider []dto.RiderListResponse, err er
 	return parsedRiders, nil
 }
 
-func (r *riderRepositoryImpl) GetRider(id int) (models.Rider, error) {
+func (r *riderRepositoryImpl) GetRider(id int, req *http.Request) (dto.RiderResponse, error) {
 	var rider models.Rider
     res := r.db.First(&rider, id)
-    if res.Error!= nil {
-        return rider, res.Error
+	if res.Error!= nil {
+        return dto.RiderResponse{}, res.Error
     }
-    return rider, nil
+	domain := getDomainURL(req)
+	var selfUrl = fmt.Sprintf("%s/riders/%d", domain, rider.ID)
+	response := dto.RiderResponse{
+		ID: rider.ID,
+        FirstName: rider.FirstName,
+        LastName: rider.LastName,
+        RiderID:  rider.RiderID,
+        BikeNumber: rider.BikeNumber,
+        Address: rider.Address,
+        SuccessfulRides: rider.SuccessfulRides,
+        Rating: rider.Rating,
+        CurrentLocation: rider.CurrentLocation,
+        Level: rider.Level,
+        SelfUrl: selfUrl,
+	}
+    return response, nil
 }
 
 func (r *riderRepositoryImpl)CreateRating(Id uint)(string, error){
@@ -70,4 +89,13 @@ func (r *riderRepositoryImpl)CreateRating(Id uint)(string, error){
     // TODO: implement rating logic
     return "Rating submitted successfully", nil
 	// 
+}
+
+// get domain function
+func getDomainURL(r *http.Request) string {
+    scheme := "http"
+    if r.TLS != nil {
+        scheme = "https"
+    }
+    return scheme + "://" + r.Host
 }

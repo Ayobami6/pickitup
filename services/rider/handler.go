@@ -123,7 +123,7 @@ func(h *riderHandler) handleRegisterRider(w http.ResponseWriter, r *http.Request
 }
 
 func (h *riderHandler) handleGetRiders(w http.ResponseWriter, r *http.Request) {
-	riders, err := h.repo.GetRiders()
+	riders, err := h.repo.GetRiders(r)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
 	}
@@ -138,9 +138,13 @@ func (h *riderHandler) handleGetRider(w http.ResponseWriter, r *http.Request) {
         utils.WriteError(w, http.StatusBadRequest, "Invalid ID")
         return
     }
-    rider, err := h.repo.GetRider(rider_id)
+	
+    rider, err := h.repo.GetRider(rider_id, r)
+	
     if err!= nil {
         utils.WriteError(w, http.StatusNotFound, "Rider not found")
     }
     utils.WriteJSON(w, http.StatusOK, "success", rider, "Rider Fetch Successfully")
 }
+
+
