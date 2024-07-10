@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Ayobami6/pickitup/services/order"
 	"github.com/Ayobami6/pickitup/services/rider"
 	"github.com/Ayobami6/pickitup/services/root"
 	"github.com/Ayobami6/pickitup/services/user"
@@ -42,6 +43,10 @@ func (a *APIServer) Run() error {
 	riderHandler := rider.NewRiderHandler(riderRepo, userRepo)
     // register the rider routes
     riderHandler.RegisterRoutes(subrouter)
+	// order Stuff
+	orderStore := order.NewOrderRepoImpl(a.db)
+	orderHandler := order.NewOrderHandler(orderStore, userRepo, riderRepo)
+	orderHandler.RegisterRoutes(subrouter)
 
 	log.Println("Server is running on :", a.addr)
 

@@ -3,10 +3,20 @@ package models
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"strings"
 	"time"
 
 	"gorm.io/gorm"
+)
+
+type StatusType string
+
+const (
+    Delivered StatusType = "Delivered"
+    Canceled StatusType = "Canceled"
+    Pending StatusType = "Pending"
+	InDelivery StatusType = "InDelivery"
 )
 
 type User struct {
@@ -21,6 +31,7 @@ type User struct {
 	Password string `json:"password"`
 	Verified bool `json:"verified" gorm:"default:false"`
 	Rider      Rider      `gorm:"foreignKey:UserID"`
+	Orders 	[]Order `json:"orders" gorm:"foreignKey:UserID"`
 }
 
 type Rider struct {
@@ -40,8 +51,10 @@ type Rider struct {
 	Level string  `json:"level"`
 	CurrentLocation string `json:"current_location"`
 	Reviews  []Review `json:"reviews" gorm:"foreignKey:RiderID"`
+	Orders 	[]Order `json:"orders" gorm:"foreignKey:RiderID"`
 	CreatedAt           time.Time `json:"created_at"`
     UpdatedAt           time.Time `json:"updated_at"`
+	// add minimum and maximum charge to this
 }
 
 func (u *Rider) BeforeCreate(tx *gorm.DB) (err error) {
@@ -59,10 +72,51 @@ func (r *Rider) BeforeUpdate(tx *gorm.DB) (err error) {
     return nil
 }
 
+type Order struct {
+	ID uint `json:"id"`
+	RiderID uint `json:"rider_id"`
+	UserID uint `json:"user_id"`
+	RefID string `json:"ref_id" gorm:"uniqueIndex;size:10"`
+	Status StatusType `json:"status" gorm:"default:Pending"`
+	Item string `json:"item"`
+	Quantity int `json:"quantity"`
+	Charge float64 `json:"price"`
+	PaymentStatus string `json:"payment_status"`
+	CreatedAt           time.Time `json:"created_at"`
+    UpdatedAt           time.Time `json:"updated_at"`
+
+}
+
+func(u *Order) BeforeSave(tx *gorm.DB) error {
+	if u.Status != Delivered && u.Status != Canceled && u.Status != Pending && u.Status != InDelivery {
+		return fmt.Errorf("invalid status")
+	}
+	return nil
+}
+
+func (o *Order) BeforeCreate(tx *gorm.DB) (err error) {
+	Id, err := generateRandomID(4)
+	if err!= nil {
+        return err
+    }
+	id := strings.ToUpper(Id)
+	now := time.Now()
+	year, month, day := now.Date()
+    hour, minute, _ := now.Clock()
+	o.RefID = fmt.Sprintf("PICK%s%d%d%d%d%d",id,year,month,day,hour,minute)
+	o.CreatedAt = time.Now()
+    o.UpdatedAt = time.Now()
+	return nil
+}
+
+func (o *Order) BeforeUpdate(tx *gorm.DB) (err error) {
+    o.UpdatedAt = time.Now()
+    return nil
+}
 
 
 type Review struct {
-	gorm.Model
+	ID		uint `json:"id"`
 	RiderID uint `json:"rider_id"`
 	Rating float64 `json:"rating"`
 	Comment string `json:"comment"`

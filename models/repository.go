@@ -17,3 +17,8 @@ type UserRepo interface {
 	CreateUser(user *User) error
 	GetUserByEmail(email string) (*User, error)
 }
+
+
+type OrderRepo interface {
+	CreateOrder(order *Order) (error)
+}
