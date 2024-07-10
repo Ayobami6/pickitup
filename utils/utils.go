@@ -145,6 +145,20 @@ func SendMail(recipient string, subject string, username string, message string)
 
 	return nil
 
+}
 
 
+func GetTokenFromRequest(r *http.Request) (string, error) {
+	tokenAuth := r.Header.Get("Authorization")
+    tokenQuery := r.URL.Query().Get("token")
+
+    if tokenAuth!= "" {
+        return tokenAuth, nil
+    }
+
+    if tokenQuery!= "" {
+        return tokenQuery, nil
+    }
+
+    return "", errors.New("token not found in request")
 }
