@@ -37,3 +37,12 @@ func (r *userRepoImpl) GetUserByEmail(email string) (*models.User, error) {
 	}
 	return result, nil
 }
+
+func (r *userRepoImpl) GetUserByID(id int) (*models.User, error) {
+	result := &models.User{}
+    err := r.db.First(&result, id).Error
+    if err!= nil {
+        return nil, err
+    }
+    return result, nil
+}

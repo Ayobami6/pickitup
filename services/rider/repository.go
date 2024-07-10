@@ -91,6 +91,16 @@ func (r *riderRepositoryImpl)CreateRating(Id uint)(string, error){
 	// 
 }
 
+
+func (r *riderRepositoryImpl) GetRiderByID(Id int) (*models.Rider, error){
+	var rider models.Rider
+    res := r.db.First(&rider, Id)
+    if res.Error!= nil {
+        return nil, res.Error
+    }
+    return &rider, nil
+}
+
 // get domain function
 func getDomainURL(r *http.Request) string {
     scheme := "http"

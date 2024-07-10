@@ -12,6 +12,13 @@ import (
 
 type StatusType string
 
+type PaymentStatus string
+
+const (
+	Paid PaymentStatus = "Paid"
+	Unpaid PaymentStatus = "Unpaid"
+)
+
 const (
     Delivered StatusType = "Delivered"
     Canceled StatusType = "Canceled"
@@ -55,6 +62,8 @@ type Rider struct {
 	CreatedAt           time.Time `json:"created_at"`
     UpdatedAt           time.Time `json:"updated_at"`
 	// add minimum and maximum charge to this
+	MinimumCharge float64 `json:"minimum_charge"`
+	MaximumCharge float64 `json:"maximum_charge"`
 }
 
 func (u *Rider) BeforeCreate(tx *gorm.DB) (err error) {
@@ -81,7 +90,9 @@ type Order struct {
 	Item string `json:"item"`
 	Quantity int `json:"quantity"`
 	Charge float64 `json:"price"`
-	PaymentStatus string `json:"payment_status"`
+	PaymentStatus PaymentStatus `json:"payment_status"`
+	PickUpAddress string `json:"pickup_address"`
+	DropOffAddress string `json:"dropoff_address"`
 	CreatedAt           time.Time `json:"created_at"`
     UpdatedAt           time.Time `json:"updated_at"`
 
@@ -90,6 +101,9 @@ type Order struct {
 func(u *Order) BeforeSave(tx *gorm.DB) error {
 	if u.Status != Delivered && u.Status != Canceled && u.Status != Pending && u.Status != InDelivery {
 		return fmt.Errorf("invalid status")
+	}
+	if u.PaymentStatus != Paid && u.PaymentStatus != Unpaid {
+		return fmt.Errorf("invalid payment status")
 	}
 	return nil
 }
@@ -116,6 +130,7 @@ func (o *Order) BeforeUpdate(tx *gorm.DB) (err error) {
 
 
 type Review struct {
+	gorm.Model
 	ID		uint `json:"id"`
 	RiderID uint `json:"rider_id"`
 	Rating float64 `json:"rating"`
