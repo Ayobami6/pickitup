@@ -11,7 +11,8 @@ type RiderRepository interface {
 	GetRiders(req *http.Request) ([]dto.RiderListResponse, error)
 	GetRider(id int, req *http.Request) (dto.RiderResponse, error)
 	CreateRating(riderId uint) (string, error)
-	GetRiderByID(id int) (*Rider, error)
+	GetRiderByUserID(userID uint) (*Rider, error)
+	GetRiderByID(id uint)(*Rider, error)
 }
 
 type UserRepo interface {

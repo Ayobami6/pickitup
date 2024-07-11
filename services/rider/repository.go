@@ -92,13 +92,22 @@ func (r *riderRepositoryImpl)CreateRating(Id uint)(string, error){
 }
 
 
-func (r *riderRepositoryImpl) GetRiderByID(Id int) (*models.Rider, error){
+func (r *riderRepositoryImpl) GetRiderByUserID(userID uint) (*models.Rider, error){
 	var rider models.Rider
-    res := r.db.First(&rider, Id)
+    res := r.db.Where(&models.Rider{UserID: userID}).First(&rider)
     if res.Error!= nil {
         return nil, res.Error
     }
     return &rider, nil
+}
+
+func (r *riderRepositoryImpl) GetRiderByID(id uint) (*models.Rider, error) {
+	var rider models.Rider
+	res := r.db.First(&rider, id)
+	if res.Error!= nil {
+        return nil, res.Error
+    }
+	return &rider, nil
 }
 
 // get domain function

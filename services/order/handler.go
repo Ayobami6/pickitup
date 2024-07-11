@@ -46,7 +46,8 @@ func (o *orderHandler) handleCreateOrder(w http.ResponseWriter, r *http.Request)
         return
     }
     // get the rider
-    rider, err := o.riderStore.GetRiderByID(riderID)
+	var riderId uint = uint(riderID)
+    rider, err := o.riderStore.GetRiderByID(riderId)
     if err!= nil {
         utils.WriteError(w, http.StatusInternalServerError, "Failed to get rider")
         return

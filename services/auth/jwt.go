@@ -18,6 +18,8 @@ type contextKey string
 
 var UserKey contextKey= "UserID"
 
+const RiderKey contextKey = "RiderID"
+
 
 func CreateJWT(secret []byte, userId int) (string, error) {
 	exp, err := strconv.ParseInt(config.GetEnv("JWT_EXPIRATION", "25000"), 10, 64)
@@ -35,6 +37,58 @@ func CreateJWT(secret []byte, userId int) (string, error) {
 	}
 	return tokenStr, nil
 
+}
+
+func RiderAuth(handlerFunc http.HandlerFunc, riderStore models.RiderRepository) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		// get token frome request
+		tokenString, err := utils.GetTokenFromRequest(r)
+		if err != nil {
+			Forbidden(w)
+			return
+		}
+		token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+            if _, ok := token.Method.(*jwt.SigningMethodHMAC);!ok {
+                return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+            }
+            return []byte(config.GetEnv("JWT_SECRET", "")), nil
+        })
+		if err!= nil ||!token.Valid {
+            Forbidden(w)
+            return
+        }
+		claims, ok := token.Claims.(*jwt.MapClaims)
+		if !ok {
+			Forbidden(w)
+			return
+		}
+		userIDStr, ok := (*claims)["UserID"].(string)
+		if!ok {
+            Forbidden(w)
+            return
+        }
+		userID, err := strconv.Atoi(userIDStr)
+		if err!= nil {
+            Forbidden(w)
+            return
+        }
+		var ID uint = uint(userID)
+		// get rider by the user ID
+		rider, err := riderStore.GetRiderByUserID(ID)
+		if err != nil {
+			utils.WriteError(w, http.StatusInternalServerError, "Something Went Wrong!")
+			return
+		}
+		if rider.ID == 0 {
+			Forbidden(w)
+			return
+		}
+		// save Rider Id to the request context
+		ctx := context.WithValue(r.Context(), UserKey, userID)
+        ctx = context.WithValue(ctx, RiderKey, rider.ID)
+        r = r.WithContext(ctx)
+        handlerFunc(w, r)
+	}
 }
 
 func Auth(handlerFunc http.HandlerFunc, userStore models.UserRepo) http.HandlerFunc {
