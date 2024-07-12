@@ -39,6 +39,7 @@ func CreateJWT(secret []byte, userId int) (string, error) {
 
 }
 
+
 func RiderAuth(handlerFunc http.HandlerFunc, riderStore models.RiderRepository) http.HandlerFunc{
 	return func(w http.ResponseWriter, r *http.Request) {
 		// get token frome request
@@ -88,6 +89,52 @@ func RiderAuth(handlerFunc http.HandlerFunc, riderStore models.RiderRepository) 
         ctx = context.WithValue(ctx, RiderKey, rider.ID)
         r = r.WithContext(ctx)
         handlerFunc(w, r)
+	}
+}
+
+
+func UserAuth(handlerFunc http.HandlerFunc, riderStore models.RiderRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tokenString, err := utils.GetTokenFromRequest(r)
+		if err!= nil {
+            http.Error(w, "Missing or invalid token", http.StatusUnauthorized)
+            return
+        }
+		token, err := signToken(tokenString)
+		if err!= nil || !token.Valid {
+            Forbidden(w)
+			return
+        }
+		// get claims
+		claims, ok := token.Claims.(*jwt.MapClaims)
+		if !ok {
+			Forbidden(w)
+            return
+		}
+		userIDStr, ok := (*claims)["UserID"].(string)
+		if !ok {
+			Forbidden(w)
+			return
+		}
+		userID, err := strconv.Atoi(userIDStr)
+		if err!= nil {
+            Forbidden(w)
+            return
+        }
+		var ID uint = uint(userID)
+		// get rider by the user ID
+		user, err := riderStore.GetRiderByUserID(ID)
+		if err!= nil {
+			utils.WriteError(w, http.StatusInternalServerError, "Something Went Wrong!")
+            return
+		}
+		if user.ID != 0 {
+            Forbidden(w)
+			return
+        }
+		// save User Id to the request context
+		ctx := context.WithValue(r.Context(), UserKey, userID)
+        handlerFunc(w, r.WithContext(ctx))
 	}
 }
 
@@ -151,4 +198,22 @@ func GetUserIDFromContext(ctx context.Context) int {
         return -1
     }
     return userID
+}
+
+func GetRiderIDFromContext(ctx context.Context) int {
+	riderID, ok := ctx.Value(RiderKey).(int)
+    if!ok {
+        return -1
+    }
+    return riderID
+}
+
+func signToken(tokenString string) (*jwt.Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+        if _, ok := token.Method.(*jwt.SigningMethodHMAC);!ok {
+            return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+        }
+        return []byte(config.GetEnv("JWT_SECRET", "")), nil
+    })
+	return token, err
 }
