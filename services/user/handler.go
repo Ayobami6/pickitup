@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/Ayobami6/pickitup/config"
@@ -17,15 +18,17 @@ import (
 
 type userHandler struct {
 	repo models.UserRepo
+	riderRepo models.RiderRepository
 }
 
-func NewUserHandler(repo models.UserRepo) *userHandler {
-	return &userHandler{repo: repo}
+func NewUserHandler(repo models.UserRepo, riderRepo models.RiderRepository) *userHandler {
+	return &userHandler{repo: repo, riderRepo: riderRepo}
 }
 
 func (h *userHandler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/register", h.handleRegister).Methods("POST")
 	router.HandleFunc("/login", h.handleLogin).Methods("POST")
+	router.HandleFunc("{rider_id}/ratings", auth.RiderAuth(h.handleGiveRatings, h.riderRepo)).Methods("POST")
 }
 
 func (h *userHandler) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -128,4 +131,48 @@ func (h *userHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.WriteJSON(w, http.StatusOK, "login Successful", map[string]string{"token": token})
+}
+
+
+func (h *userHandler) handleGiveRatings(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+    riderID := vars["rider_id"]
+
+    var payload dto.CreateRiderRationDTO
+    if err := utils.ParseJSON(r, &payload); err!= nil {
+        utils.WriteError(w, http.StatusBadRequest, "Invalid Payload")
+        return
+    }
+    // validate
+    if vErr := utils.Validate.Struct(payload); vErr!= nil {
+        _ = vErr.(validator.ValidationErrors)
+        utils.WriteError(w, http.StatusBadRequest, "Bad Data!")
+        return
+    }
+	riderId, err := strconv.Atoi(riderID)
+	if err!= nil {
+        utils.WriteError(w, http.StatusBadRequest, "Invalid Rider ID")
+        return
+    }
+
+	var rID uint = uint(riderId)
+
+	// create rating
+	cErr := h.repo.CreateRating(&models.Review{
+		RiderID: rID,
+		Rating: payload.Rating,
+        Comment: payload.Comment,
+	})
+	if cErr!= nil {
+        utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
+        return
+    }
+    // update user rating
+    err = h.riderRepo.UpdateRating(rID)
+    if err!= nil {
+        utils.WriteError(w, http.StatusInternalServerError, "Something went wrong")
+        return
+    }
+
+    utils.WriteJSON(w, http.StatusOK, "success", nil, "Ratings Successfully Submitted")
 }

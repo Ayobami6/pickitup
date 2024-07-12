@@ -82,15 +82,6 @@ func (r *riderRepositoryImpl) GetRider(id int, req *http.Request) (dto.RiderResp
     return response, nil
 }
 
-func (r *riderRepositoryImpl)CreateRating(Id uint)(string, error){
-	// constraints only a user not rider can submit rating
-	// this should be sent by and authenticated user to get their from the context
-	//
-    // TODO: implement rating logic
-    return "Rating submitted successfully", nil
-	// 
-}
-
 
 func (r *riderRepositoryImpl) GetRiderByUserID(userID uint) (*models.Rider, error){
 	var rider models.Rider
@@ -117,4 +108,41 @@ func getDomainURL(r *http.Request) string {
         scheme = "https"
     }
     return scheme + "://" + r.Host
+}
+
+func (r *riderRepositoryImpl)UpdateRating(riderID uint)(error){
+	var rider models.Rider
+	res := r.db.Where(&models.Rider{ID: riderID}).First(&rider)
+	if res.Error!= nil {
+        return res.Error
+    }
+	// get all ratings for the rider 
+	var reviews []models.Review
+    res = r.db.Where(&models.Review{RiderID: riderID}).Find(&reviews)
+    if res.Error!= nil {
+        return res.Error
+    }
+
+    // calculate new average rating
+    var totalRating float64 = 0
+    for _, review := range reviews {
+        totalRating += review.Rating
+    }
+    newRating := totalRating / float64(len(reviews))
+
+    // update rider rating
+    rider.Rating = newRating
+    res = r.db.Save(&rider)
+    if res.Error!= nil {
+        return res.Error
+    }
+
+    // send notification to all users who rated the rider
+    // sendNotificationToRaterUsers(riderID, newRating)
+    // send notification to all users who requested rides from the rider
+    // sendNotification
+	
+
+    return  nil
+	// 
 }
