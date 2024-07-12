@@ -134,8 +134,6 @@ func (o *orderHandler) handleCreateOrder(w http.ResponseWriter, r *http.Request)
 
     // write the response
     utils.WriteJSON(w, http.StatusCreated, "success", data, "Order created successfully")
-
-
 }
 
 func (o *orderHandler) handleGetOrders(w http.ResponseWriter, r *http.Request) {
@@ -176,13 +174,44 @@ func (o *orderHandler) handleConfirmDeliveryStatus(w http.ResponseWriter, r *htt
         utils.WriteError(w, http.StatusInternalServerError, "Failed to update order status")
         return
     }
+	// get orderby the id
+	orderResponse, err := o.store.GetOrderByID(orderID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError)
+		return
+	}
+	riderID := orderResponse.RiderID
+	rider, err := o.riderStore.GetRiderByID(riderID)
+	if err!= nil {
+        utils.WriteError(w, http.StatusInternalServerError, "Failed to get rider")
+        return
+    }
+	riderUserID := rider.UserID
+	chargeAmount := orderResponse.Charge
+	riderUser, err := o.userStore.GetUserByID(int(riderUserID))
+	if err!= nil {
+        utils.WriteError(w, http.StatusInternalServerError, "Failed to get rider user")
+        return
+    }
 	// TODO: add charge amount to rider wallet
+	err = riderUser.Credit(o.db, chargeAmount)
+    if err!= nil {
+        utils.WriteError(w, http.StatusInternalServerError, "Failed to credit rider wallet")
+        return
+    }
+    // TODO: update rider successful ride by 1
+	err = rider.UpdateSuccessfulRides(o.db)
+	if err!= nil {
+        log.Println("Error updating Rider Successful rides")
+    }
 
-	// TODO: update rider successful ride by 1
+    // TODO: add email notification
+	message := fmt.Sprintf("Your order delivery has been successful confirmed. ₦%.1f has been added to your wallet", chargeAmount)
+	subject := "Order Delivery Notification"
 
-	// TODO: add email notification
+	go utils.SendMail(riderUser.Email, subject, riderUser.UserName, message)
 
-	utils.WriteJSON(w, http.StatusOK, "success", nil, "Order Delivery Successfully Confirmed")
+    utils.WriteJSON(w, http.StatusOK, "success", nil, "Order Delivery Successfully Confirmed")
 }
 
 func (o *orderHandler) handleAcknowledge(w http.ResponseWriter, r *http.Request) {

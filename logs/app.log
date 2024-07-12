@@ -107,3 +107,24 @@ created by net/http.(*Server).Serve in goroutine 1
 2024/07/12 23:01:15 api.go:52: Server is running on : 0.0.0.0:2300
 2024/07/12 23:04:39 db.go:15: Database Connected Successfully!
 2024/07/12 23:04:41 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:10:55 db.go:15: Database Connected Successfully!
+2024/07/12 23:10:56 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:12:23 db.go:15: Database Connected Successfully!
+2024/07/12 23:12:24 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:18:48 db.go:15: Database Connected Successfully!
+2024/07/12 23:18:52 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:19:43 db.go:15: Database Connected Successfully!
+2024/07/12 23:19:44 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:22:07 db.go:15: Database Connected Successfully!
+2024/07/12 23:22:13 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:22:18 db.go:15: Database Connected Successfully!
+2024/07/12 23:22:21 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:25:23 db.go:15: Database Connected Successfully!
+2024/07/12 23:25:24 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:26:04 db.go:15: Database Connected Successfully!
+2024/07/12 23:26:09 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:32:00 db.go:15: Database Connected Successfully!
+2024/07/12 23:32:01 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:32:14 db.go:15: Database Connected Successfully!
+2024/07/12 23:32:16 db.go:15: Database Connected Successfully!
+2024/07/12 23:32:17 api.go:52: Server is running on : 0.0.0.0:2300
