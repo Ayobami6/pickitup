@@ -30,4 +30,6 @@ type OrderRepo interface {
 	CreateOrder(order *Order) (error)
 	GetOrders(userID uint)([]orderDto.OrderResponseDTO, error)
 	UpdateDeliveryStatus(orderId uint, status StatusType) error
+	UpdateAcknowledgeStatus(orderId uint) error
+	GetOrderByID(orderId uint) (orderDto.OrderResponseDTO, error)
 }

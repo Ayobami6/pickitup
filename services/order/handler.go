@@ -30,7 +30,8 @@ func NewOrderHandler(store models.OrderRepo, us models.UserRepo, rs models.Rider
 func (o *orderHandler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/orders/{rider_id}", auth.Auth(o.handleCreateOrder, o.userStore)).Methods("POST")
 	router.HandleFunc("/orders", auth.Auth(o.handleGetOrders, o.userStore)).Methods("GET")
-	router.HandleFunc("/orders/delivery", auth.UserAuth(o.handleConfirmDeliveryStatus, o.riderStore)).Methods("POST")
+	router.HandleFunc("/orders/{id}/delivery", auth.UserAuth(o.handleConfirmDeliveryStatus, o.riderStore)).Methods("PATCH")
+	router.HandleFunc("/orders/{id}/acknowledge", auth.RiderAuth(o.handleAcknowledge, o.riderStore)).Methods("PATCH")
 	
 }
 
@@ -175,6 +176,55 @@ func (o *orderHandler) handleConfirmDeliveryStatus(w http.ResponseWriter, r *htt
         utils.WriteError(w, http.StatusInternalServerError, "Failed to update order status")
         return
     }
+	// TODO: add email notification
 
 	utils.WriteJSON(w, http.StatusOK, "success", nil, "Order Delivery Successfully Confirmed")
+}
+
+func (o *orderHandler) handleAcknowledge(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	orderID, err := strconv.Atoi(params["id"])
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "Invalid ID")
+		return
+	}
+	var ID uint = uint(orderID)
+	// update the acknowledgement
+	err = o.store.UpdateAcknowledgeStatus(ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError)
+	}
+	// update delivery status to indelivery
+	err = o.store.UpdateDeliveryStatus(ID, models.InDelivery)
+	if err!= nil {
+        utils.WriteError(w, http.StatusInternalServerError)
+    }
+	// get the updated order 
+	order, Err := o.store.GetOrderByID(ID)
+	if Err != nil {
+		log.Println(Err)
+	}
+	user, userErr := o.userStore.GetUserByID(int(order.UserID))
+	if userErr != nil {
+		log.Println(userErr)
+	}
+	rider, riderErr := o.riderStore.GetRiderByID(uint(order.RiderID))
+	if riderErr!= nil {
+        log.Println(riderErr)
+    }
+	riderUser, err := o.userStore.GetUserByID(int(rider.ID))
+	if err != nil {
+		log.Println(err)
+	}
+	riderMessage := fmt.Sprintf("You have successfully acknowledged pickup order %s\n Once delivered your wallet will be automatically funded with the charge amount .\n Do make sure to ask your client to confirm your delivery before you leave", order.RefID)
+	userMessage := fmt.Sprintf("Your Pickup Order %s has been acknowledged.\n Please refer to your previous email for your rider phone number so as to monitor .\n Please make sure to confirm your order delivery on your dashboard once your items has been delivered", order.RefID)
+	subject := "PickItUp Order Acknowledgement"
+	// TODO: add email notification
+	go utils.SendMail(user.Email, subject, user.UserName, userMessage)
+    go utils.SendMail(riderUser.Email, subject, riderUser.UserName, riderMessage)
+
+	utils.WriteJSON(w, http.StatusOK, "success", nil, "Order Successfully Acknowledged!")
+
+
+
 }

@@ -2,13 +2,28 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"os"
 
 	"github.com/Ayobami6/pickitup/cmd/api"
 	"github.com/Ayobami6/pickitup/config"
 	"github.com/Ayobami6/pickitup/db"
 	_ "github.com/joho/godotenv/autoload"
 )
+
+func init() {
+    file, err := os.OpenFile("logs/app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+    if err != nil {
+        log.Fatalf("Failed to open log file: %v", err)
+    }
+
+	multiWriter := io.MultiWriter(file, os.Stdout)
+
+    log.SetOutput(multiWriter)
+
+    log.SetFlags(log.LstdFlags | log.Lshortfile)
+}
 
 func main() {
 	host := config.GetEnv("DB_HOST", "localhost")

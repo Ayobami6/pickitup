@@ -158,9 +158,12 @@ func (o *Order) BeforeCreate(tx *gorm.DB) (err error) {
 
 func (o *Order) BeforeUpdate(tx *gorm.DB) (err error) {
     o.UpdatedAt = time.Now()
+	if o.Acknowledge {
+		fmt.Println("I got here")
+		o.Status = InDelivery
+	}
     return nil
 }
-
 
 type Review struct {
 	ID		uint `json:"id"`

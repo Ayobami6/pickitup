@@ -1,0 +1,10 @@
+2024/07/12 16:30:14 db.go:15: Database Connected Successfully!
+2024/07/12 16:30:15 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:34:17 db.go:15: Database Connected Successfully!
+2024/07/12 16:34:17 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:36:48 db.go:15: Database Connected Successfully!
+2024/07/12 16:36:49 db.go:15: Database Connected Successfully!
+2024/07/12 16:36:49 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:36:51 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:47:19 db.go:15: Database Connected Successfully!
+2024/07/12 16:47:19 api.go:52: Server is running on : localhost:2300
