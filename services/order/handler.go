@@ -178,6 +178,8 @@ func (o *orderHandler) handleConfirmDeliveryStatus(w http.ResponseWriter, r *htt
     }
 	// TODO: add charge amount to rider wallet
 
+	// TODO: update rider successful ride by 1
+
 	// TODO: add email notification
 
 	utils.WriteJSON(w, http.StatusOK, "success", nil, "Order Delivery Successfully Confirmed")

@@ -29,6 +29,7 @@ func (h *riderHandler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/riders", h.handleGetRiders).Methods("GET")
 	router.HandleFunc("/riders/{id}", h.handleGetRider).Methods("GET")
 	router.HandleFunc("/riders/charges", auth.RiderAuth(h.handleUpdateCharges, h.repo)).Methods("PATCH")
+	router.HandleFunc("/riders/status", auth.RiderAuth(h.handleUpdateRiderAvailabilityStatus, h.repo)).Methods("PATCH")
 
 }
 
@@ -176,4 +177,42 @@ func (h *riderHandler) handleUpdateCharges(w http.ResponseWriter, r *http.Reques
 
 	utils.WriteJSON(w, http.StatusOK, "status", nil, "Update Successful")
 
+}
+
+func (h *riderHandler) handleUpdateRiderAvailabilityStatus(w http.ResponseWriter, r *http.Request) {
+	userID := auth.GetUserIDFromContext(r.Context())
+    if userID == -1 {
+        auth.Forbidden(w)
+        return
+    }
+
+    var payload dto.UpdateRiderAvailabilityStatusDTO
+
+    err := utils.ParseJSON(r, &payload)
+    if err!= nil {
+        utils.WriteError(w, http.StatusBadRequest, "Bad Data!")
+        return 
+    }
+
+    var userId uint = uint(userID)
+
+	statusMap := map[string]bool{
+		"Available": true,
+		"Unavailable": true,
+		"On Break": true,
+		"Busy": true,
+	}
+	if !statusMap[payload.AvailabilityStatus] {
+		utils.WriteError(w, http.StatusBadRequest, "Invalid availability status")
+		return
+	}
+
+    err = h.repo.UpdateRiderAvailability(userId, payload.AvailabilityStatus)
+    if err!= nil {
+        log.Println(err)
+        utils.WriteError(w, http.StatusInternalServerError, "Something Went Wrong")
+        return
+    }
+
+    utils.WriteJSON(w, http.StatusOK, "status", nil, "Update Successful")
 }

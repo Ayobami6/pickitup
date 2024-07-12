@@ -27,3 +27,81 @@
 2024/07/12 21:47:56 api.go:52: Server is running on : localhost:2300
 2024/07/12 22:07:53 db.go:15: Database Connected Successfully!
 2024/07/12 22:07:55 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 22:34:55 db.go:15: Database Connected Successfully!
+2024/07/12 22:35:01 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 22:35:05 db.go:15: Database Connected Successfully!
+2024/07/12 22:35:09 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 22:39:40 db.go:15: Database Connected Successfully!
+2024/07/12 22:39:43 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 22:40:53 db.go:15: Database Connected Successfully!
+2024/07/12 22:40:53 db.go:15: Database Connected Successfully!
+2024/07/12 22:40:54 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 22:55:47 db.go:15: Database Connected Successfully!
+2024/07/12 22:55:50 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 22:55:52 db.go:15: Database Connected Successfully!
+2024/07/12 22:55:54 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 22:57:26 utils.go:92: [Unauthorized]
+2024/07/12 22:58:07 server.go:3418: http: panic serving 127.0.0.1:59305: runtime error: index out of range [0] with length 0
+goroutine 35 [running]:
+net/http.(*conn).serve.func1()
+	C:/Program Files/Go/src/net/http/server.go:1903 +0xbe
+panic({0x1178ea0?, 0xc00008e198?})
+	C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+github.com/Ayobami6/pickitup/services/rider.(*riderRepositoryImpl).GetRiders(0xc0002fe078, 0xc00016cd80)
+	C:/Users/Ayo/Projects/pickitup/services/rider/repository.go:54 +0x345
+github.com/Ayobami6/pickitup/services/rider.(*riderHandler).handleGetRiders(0x12e7918?, {0x12e6030, 0xc0001740e0}, 0x12d9cf8?)
+	C:/Users/Ayo/Projects/pickitup/services/rider/handler.go:128 +0x32
+net/http.HandlerFunc.ServeHTTP(0xc00016cc60?, {0x12e6030?, 0xc0001740e0?}, 0xa8487a?)
+	C:/Program Files/Go/src/net/http/server.go:2171 +0x29
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc0000006c0, {0x12e6030, 0xc0001740e0}, 0xc00016c480)
+	C:/Users/Ayo/go/pkg/mod/github.com/gorilla/mux@v1.8.1/mux.go:212 +0x1e2
+net/http.serverHandler.ServeHTTP({0xc0002e4030?}, {0x12e6030?, 0xc0001740e0?}, 0x6?)
+	C:/Program Files/Go/src/net/http/server.go:3142 +0x8e
+net/http.(*conn).serve(0xc0001701b0, {0x12e7918, 0xc00027d230})
+	C:/Program Files/Go/src/net/http/server.go:2044 +0x5e8
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Program Files/Go/src/net/http/server.go:3290 +0x4b4
+2024/07/12 22:58:13 server.go:3418: http: panic serving 127.0.0.1:59308: runtime error: index out of range [0] with length 0
+goroutine 21 [running]:
+net/http.(*conn).serve.func1()
+	C:/Program Files/Go/src/net/http/server.go:1903 +0xbe
+panic({0x1178ea0?, 0xc00008e330?})
+	C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+github.com/Ayobami6/pickitup/services/rider.(*riderRepositoryImpl).GetRiders(0xc0002fe078, 0xc00016dc20)
+	C:/Users/Ayo/Projects/pickitup/services/rider/repository.go:54 +0x345
+github.com/Ayobami6/pickitup/services/rider.(*riderHandler).handleGetRiders(0x12e7918?, {0x12e6030, 0xc000174380}, 0x12d9cf8?)
+	C:/Users/Ayo/Projects/pickitup/services/rider/handler.go:128 +0x32
+net/http.HandlerFunc.ServeHTTP(0xc00016db00?, {0x12e6030?, 0xc000174380?}, 0xa8487a?)
+	C:/Program Files/Go/src/net/http/server.go:2171 +0x29
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc0000006c0, {0x12e6030, 0xc000174380}, 0xc00016cfc0)
+	C:/Users/Ayo/go/pkg/mod/github.com/gorilla/mux@v1.8.1/mux.go:212 +0x1e2
+net/http.serverHandler.ServeHTTP({0xc0002e44e0?}, {0x12e6030?, 0xc000174380?}, 0x6?)
+	C:/Program Files/Go/src/net/http/server.go:3142 +0x8e
+net/http.(*conn).serve(0xc0000c6240, {0x12e7918, 0xc00027d230})
+	C:/Program Files/Go/src/net/http/server.go:2044 +0x5e8
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Program Files/Go/src/net/http/server.go:3290 +0x4b4
+2024/07/12 22:58:43 db.go:15: Database Connected Successfully!
+2024/07/12 22:58:44 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 22:58:45 server.go:3418: http: panic serving 127.0.0.1:59319: runtime error: index out of range [0] with length 0
+goroutine 7 [running]:
+net/http.(*conn).serve.func1()
+	C:/Program Files/Go/src/net/http/server.go:1903 +0xbe
+panic({0x1178ea0?, 0xc0000379e0?})
+	C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+github.com/Ayobami6/pickitup/services/rider.(*riderRepositoryImpl).GetRiders(0xc00008c4c8, 0xc0003eeb40)
+	C:/Users/Ayo/Projects/pickitup/services/rider/repository.go:54 +0x345
+github.com/Ayobami6/pickitup/services/rider.(*riderHandler).handleGetRiders(0x12e7918?, {0x12e6030, 0xc0000aa380}, 0x12d9cf8?)
+	C:/Users/Ayo/Projects/pickitup/services/rider/handler.go:128 +0x32
+net/http.HandlerFunc.ServeHTTP(0xc0003eea20?, {0x12e6030?, 0xc0000aa380?}, 0xa8487a?)
+	C:/Program Files/Go/src/net/http/server.go:2171 +0x29
+github.com/gorilla/mux.(*Router).ServeHTTP(0xc0000c2000, {0x12e6030, 0xc0000aa380}, 0xc0003ee7e0)
+	C:/Users/Ayo/go/pkg/mod/github.com/gorilla/mux@v1.8.1/mux.go:212 +0x1e2
+net/http.serverHandler.ServeHTTP({0xc0003f12c0?}, {0x12e6030?, 0xc0000aa380?}, 0x6?)
+	C:/Program Files/Go/src/net/http/server.go:3142 +0x8e
+net/http.(*conn).serve(0xc0003e3950, {0x12e7918, 0xc0003f11d0})
+	C:/Program Files/Go/src/net/http/server.go:2044 +0x5e8
+created by net/http.(*Server).Serve in goroutine 1
+	C:/Program Files/Go/src/net/http/server.go:3290 +0x4b4
+2024/07/12 23:01:14 db.go:15: Database Connected Successfully!
+2024/07/12 23:01:15 api.go:52: Server is running on : 0.0.0.0:2300

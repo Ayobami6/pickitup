@@ -51,6 +51,7 @@ func (r *riderRepositoryImpl) GetRiders(req *http.Request) (rider []dto.RiderLis
 			CurrentLocation: riders[i].CurrentLocation,
 			Level: riders[i].Level,
 			SelfUrl: fmt.Sprintf("%s/riders/%d", domain, riders[i].ID),
+            AvailabilityStatus: string(riders[i].AvailabilityStatus),
 		}
 		parsedRiders = append(parsedRiders, rider)
 		
@@ -101,6 +102,7 @@ func (r *riderRepositoryImpl) GetRider(id int, req *http.Request) (dto.RiderResp
         Reviews: reviewResponse,
         MinimumCharge: rider.MinimumCharge,
         MaximumCharge: rider.MaximumCharge,
+        AvailabilityStatus: string(rider.AvailabilityStatus),
 	}
     return response, nil
 }
@@ -179,4 +181,13 @@ func (r *riderRepositoryImpl) GetRiderReviews(riderID uint) ([]models.Review, er
         return nil, res.Error
     }
     return reviews, nil
+}
+
+
+func (r *riderRepositoryImpl)UpdateRiderAvailability(riderID uint, status string) error {
+    res := r.db.Where(&models.Rider{UserID: riderID}).Updates(&models.Rider{AvailabilityStatus: models.RiderAvailabilityStatus(status)})
+    if res.Error!= nil {
+        return res.Error
+    }
+    return nil
 }
