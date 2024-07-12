@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -81,8 +82,15 @@ func WriteJSON(w http.ResponseWriter, status int, status_msg, data any, others .
 }
 
 
-func WriteError(w http.ResponseWriter, status int, err string) {
-    WriteJSON(w, status, "error", nil, err)
+func WriteError(w http.ResponseWriter, status int, err... string) {
+	var errMessage string
+	if len(err) > 0 {
+        errMessage = err[0]
+    } else {
+		errMessage = "Don't Panic This is From Us!"
+	}
+	log.Println(err)
+    WriteJSON(w, status, "error", nil, errMessage)
 }
 
 
@@ -145,6 +153,20 @@ func SendMail(recipient string, subject string, username string, message string)
 
 	return nil
 
+}
 
 
+func GetTokenFromRequest(r *http.Request) (string, error) {
+	tokenAuth := r.Header.Get("Authorization")
+    tokenQuery := r.URL.Query().Get("token")
+
+    if tokenAuth!= "" {
+        return tokenAuth, nil
+    }
+
+    if tokenQuery!= "" {
+        return tokenQuery, nil
+    }
+
+    return "", errors.New("token not found in request")
 }

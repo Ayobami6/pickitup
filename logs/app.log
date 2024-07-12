@@ -1,0 +1,18 @@
+2024/07/12 16:30:14 db.go:15: Database Connected Successfully!
+2024/07/12 16:30:15 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:34:17 db.go:15: Database Connected Successfully!
+2024/07/12 16:34:17 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:36:48 db.go:15: Database Connected Successfully!
+2024/07/12 16:36:49 db.go:15: Database Connected Successfully!
+2024/07/12 16:36:49 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:36:51 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:47:19 db.go:15: Database Connected Successfully!
+2024/07/12 16:47:19 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:50:02 db.go:15: Database Connected Successfully!
+2024/07/12 16:50:04 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:50:51 db.go:15: Database Connected Successfully!
+2024/07/12 16:50:51 api.go:52: Server is running on : localhost:2300
+2024/07/12 16:53:48 jwt.go:142: This rider fetch error record not found
+2024/07/12 16:54:06 jwt.go:187: 5
+2024/07/12 16:55:57 db.go:15: Database Connected Successfully!
+2024/07/12 16:55:58 api.go:52: Server is running on : localhost:2300

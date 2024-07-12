@@ -46,3 +46,12 @@ func (r *userRepoImpl) GetUserByID(id int) (*models.User, error) {
     }
     return result, nil
 }
+
+
+func (r *userRepoImpl) CreateRating(review *models.Review) error {
+	res := r.db.Create(&review)
+    if res.Error!= nil {
+        return res.Error
+    }
+    return nil
+}

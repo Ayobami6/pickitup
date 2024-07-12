@@ -35,7 +35,8 @@ func (a *APIServer) Run() error {
 	rootHandler := root.NewRootHandler()
 	rootHandler.RegisterRoutes(subrouter)
 	userRepo := user.NewUserRepoImpl(a.db)
-	userHandler := user.NewUserHandler(userRepo)
+	newRiderRepo := rider.NewRiderRepositoryImpl(a.db)
+	userHandler := user.NewUserHandler(userRepo, newRiderRepo)
 	userHandler.RegisterRoutes(subrouter)
 	// rider stuffs
 	riderRepo := rider.NewRiderRepositoryImpl(a.db)
@@ -45,7 +46,7 @@ func (a *APIServer) Run() error {
     riderHandler.RegisterRoutes(subrouter)
 	// order Stuff
 	orderStore := order.NewOrderRepoImpl(a.db)
-	orderHandler := order.NewOrderHandler(orderStore, userRepo, riderRepo)
+	orderHandler := order.NewOrderHandler(orderStore, userRepo, riderRepo, a.db)
 	orderHandler.RegisterRoutes(subrouter)
 
 	log.Println("Server is running on :", a.addr)
