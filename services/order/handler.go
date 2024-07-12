@@ -28,6 +28,7 @@ func NewOrderHandler(store models.OrderRepo, us models.UserRepo, rs models.Rider
 
 func (o *orderHandler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/orders/{rider_id}", auth.Auth(o.handleCreateOrder, o.userStore)).Methods("POST")
+	router.HandleFunc("/orders", auth.Auth(o.handleGetOrders, o.userStore)).Methods("GET")
 	
 }
 
@@ -132,4 +133,19 @@ func (o *orderHandler) handleCreateOrder(w http.ResponseWriter, r *http.Request)
     utils.WriteJSON(w, http.StatusCreated, "success", data, "Order created successfully")
 
 
+}
+
+func (o *orderHandler) handleGetOrders(w http.ResponseWriter, r *http.Request) {
+	// get User ID from context
+	userID := auth.GetUserIDFromContext(r.Context())
+	if userID == -1 {
+        auth.Forbidden(w)
+        return
+    }
+	orders, err := o.store.GetOrders(uint(userID))
+	if err!= nil {
+        utils.WriteError(w, http.StatusInternalServerError, "Failed to get orders")
+        return
+    }
+	utils.WriteJSON(w, http.StatusOK, "success", orders, "Orders retrieved successfully")
 }

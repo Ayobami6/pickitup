@@ -1,9 +1,11 @@
 package order
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/Ayobami6/pickitup/models"
+	"github.com/Ayobami6/pickitup/services/order/dto"
 	"gorm.io/gorm"
 )
 
@@ -23,4 +25,28 @@ func NewOrderRepoImpl(db *gorm.DB) *OrderRepoImpl{
 
 func (o *OrderRepoImpl) CreateOrder(order *models.Order) error {
     return o.db.Create(order).Error
+}
+
+func (o *OrderRepoImpl) GetOrders(userID uint)([]dto.OrderResponseDTO, error) {
+	var orders []models.Order
+    var orderResponse []dto.OrderResponseDTO
+
+    res := o.db.Where(models.Order{UserID: userID}).Find(&orders)
+    if res.Error!= nil {
+        return orderResponse, res.Error
+    }
+
+    for _, order := range orders {
+        orderResponse = append(orderResponse, dto.OrderResponseDTO{
+			ID: order.ID,
+			UserID: order.UserID, 
+			RiderID: order.RiderID, 
+			Status: fmt.Sprintf("%s", order.Status), 
+			CreatedAt: order.CreatedAt.String(),
+			Charge: order.Charge,
+            Item: order.Item,
+		})
+    }
+
+    return orderResponse, nil
 }

@@ -3,6 +3,7 @@ package models
 import (
 	"net/http"
 
+	orderDto "github.com/Ayobami6/pickitup/services/order/dto"
 	"github.com/Ayobami6/pickitup/services/rider/dto"
 )
 
@@ -25,4 +26,5 @@ type UserRepo interface {
 
 type OrderRepo interface {
 	CreateOrder(order *Order) (error)
+	GetOrders(userID uint)([]orderDto.OrderResponseDTO, error)
 }
