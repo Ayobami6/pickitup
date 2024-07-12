@@ -145,7 +145,11 @@ func (h *userHandler) handleGiveRatings(w http.ResponseWriter, r *http.Request) 
     }
     // validate
     if vErr := utils.Validate.Struct(payload); vErr!= nil {
-        _ = vErr.(validator.ValidationErrors)
+        err := vErr.(validator.ValidationErrors)
+		if strings.Contains(err.Error(), "Rating"){
+			utils.WriteError(w, http.StatusBadRequest, "Invalid Rating")
+            return
+		}
         utils.WriteError(w, http.StatusBadRequest, "Bad Data!")
         return
     }

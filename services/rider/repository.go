@@ -3,6 +3,7 @@ package rider
 import (
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 
 	"github.com/Ayobami6/pickitup/models"
@@ -129,6 +130,8 @@ func (r *riderRepositoryImpl)UpdateRating(riderID uint)(error){
         totalRating += review.Rating
     }
     newRating := totalRating / float64(len(reviews))
+    // round to 1 decimal place
+    newRating = math.Round(newRating*10) / 10
 
     // update rider rating
     rider.Rating = newRating
