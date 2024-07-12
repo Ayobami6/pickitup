@@ -105,3 +105,5 @@ created by net/http.(*Server).Serve in goroutine 1
 	C:/Program Files/Go/src/net/http/server.go:3290 +0x4b4
 2024/07/12 23:01:14 db.go:15: Database Connected Successfully!
 2024/07/12 23:01:15 api.go:52: Server is running on : 0.0.0.0:2300
+2024/07/12 23:04:39 db.go:15: Database Connected Successfully!
+2024/07/12 23:04:41 api.go:52: Server is running on : 0.0.0.0:2300
