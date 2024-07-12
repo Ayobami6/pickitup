@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  pickitup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pickitup
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - /app/tmp
+    ports:
+      - 2400:2400
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - "6378:6379"
+    volumes:
+      - rdb-data:/usr/local/rdb
+
+    
+volumes:
+  rdb-data:
