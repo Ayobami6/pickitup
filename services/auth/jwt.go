@@ -45,7 +45,8 @@ func RiderAuth(handlerFunc http.HandlerFunc, riderStore models.RiderRepository) 
 		// get token frome request
 		tokenString, err := utils.GetTokenFromRequest(r)
 		if err != nil {
-			Forbidden(w)
+			log.Println("TokenString error: ", err)
+			utils.WriteError(w, http.StatusInternalServerError, "Don't Panic This is From Us!")
 			return
 		}
 		token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -55,22 +56,26 @@ func RiderAuth(handlerFunc http.HandlerFunc, riderStore models.RiderRepository) 
             return []byte(config.GetEnv("JWT_SECRET", "")), nil
         })
 		if err!= nil ||!token.Valid {
+			log.Println("TokenValid error: ", err)
             Forbidden(w)
             return
         }
 		claims, ok := token.Claims.(*jwt.MapClaims)
 		if !ok {
+			log.Println("Claims error: ", err)
 			Forbidden(w)
 			return
 		}
 		userIDStr, ok := (*claims)["UserID"].(string)
 		if!ok {
+			log.Println("UserId error: ", err)
             Forbidden(w)
             return
         }
 		userID, err := strconv.Atoi(userIDStr)
 		if err!= nil {
-            Forbidden(w)
+			log.Println("Atoi Convert error: ", err)
+            utils.WriteError(w, http.StatusInternalServerError, "Don't Panic This is From Us!")
             return
         }
 		var ID uint = uint(userID)

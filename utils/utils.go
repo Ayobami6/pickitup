@@ -82,9 +82,15 @@ func WriteJSON(w http.ResponseWriter, status int, status_msg, data any, others .
 }
 
 
-func WriteError(w http.ResponseWriter, status int, err string) {
+func WriteError(w http.ResponseWriter, status int, err... string) {
+	var errMessage string
+	if len(err) > 0 {
+        errMessage = err[0]
+    } else {
+		errMessage = "Don't Panic This is From Us!"
+	}
 	log.Println(err)
-    WriteJSON(w, status, "error", nil, err)
+    WriteJSON(w, status, "error", nil, errMessage)
 }
 
 

@@ -1,7 +1,6 @@
 package order
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/Ayobami6/pickitup/models"
@@ -41,10 +40,11 @@ func (o *OrderRepoImpl) GetOrders(userID uint)([]dto.OrderResponseDTO, error) {
 			ID: order.ID,
 			UserID: order.UserID, 
 			RiderID: order.RiderID, 
-			Status: fmt.Sprintf("%s", order.Status), 
+			Status: string(order.Status), 
 			CreatedAt: order.CreatedAt.String(),
 			Charge: order.Charge,
             Item: order.Item,
+			RefID: order.RefID,
 		})
     }
 

@@ -67,6 +67,16 @@ func (r *riderRepositoryImpl) GetRider(id int, req *http.Request) (dto.RiderResp
     }
 	domain := getDomainURL(req)
 	var selfUrl = fmt.Sprintf("%s/riders/%d", domain, rider.ID)
+
+    var reviewResponse []dto.ReviewResponse
+
+    for _, review := range rider.Reviews {
+        reviewResponse = append(reviewResponse, dto.ReviewResponse{
+            Rating: review.Rating,
+            Comment: review.Comment,
+        })
+    }
+    
 	response := dto.RiderResponse{
 		ID: rider.ID,
         FirstName: rider.FirstName,
@@ -79,6 +89,9 @@ func (r *riderRepositoryImpl) GetRider(id int, req *http.Request) (dto.RiderResp
         CurrentLocation: rider.CurrentLocation,
         Level: rider.Level,
         SelfUrl: selfUrl,
+        Reviews: reviewResponse,
+        MinimumCharge: rider.MinimumCharge,
+        MaximumCharge: rider.MaximumCharge,
 	}
     return response, nil
 }
@@ -148,4 +161,14 @@ func (r *riderRepositoryImpl)UpdateRating(riderID uint)(error){
 
     return  nil
 	// 
+}
+
+func (r *riderRepositoryImpl)UpdateMinAndMaxCharge(minCharge float64, maxCharge float64, userID uint) (error) {
+    res := r.db.Where(&models.Rider{UserID: userID}).Updates(&models.Rider{MinimumCharge: minCharge, MaximumCharge: maxCharge})
+    if res.Error != nil {
+        return res.Error
+    }
+    return nil
+
+
 }

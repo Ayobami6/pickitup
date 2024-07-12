@@ -28,6 +28,7 @@ func (h *riderHandler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/register/rider", h.handleRegisterRider).Methods("POST")
 	router.HandleFunc("/riders", h.handleGetRiders).Methods("GET")
 	router.HandleFunc("/riders/{id}", h.handleGetRider).Methods("GET")
+	router.HandleFunc("/riders/charges", auth.RiderAuth(h.handleUpdateCharges, h.repo)).Methods("PATCH")
 
 }
 
@@ -148,3 +149,31 @@ func (h *riderHandler) handleGetRider(w http.ResponseWriter, r *http.Request) {
 }
 
 
+func (h *riderHandler) handleUpdateCharges(w http.ResponseWriter, r *http.Request) {
+	userID := auth.GetUserIDFromContext(r.Context())
+	log.Println(userID)
+	if userID == -1 {
+		auth.Forbidden(w)
+		return
+	}
+
+	var payload dto.UpdateChargeDTO
+
+	err := utils.ParseJSON(r, &payload)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, "Bad Data!")
+		return 
+	}
+
+	var userId uint = uint(userID)
+
+	err = h.repo.UpdateMinAndMaxCharge(payload.MinimumCharge, payload.MaximumCharge, userId)
+	if err != nil {
+		log.Println(err)
+		utils.WriteError(w, http.StatusInternalServerError, "Something Went Wrong")
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, "status", nil, "Update Successful")
+
+}
