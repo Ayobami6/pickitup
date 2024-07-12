@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"unicode"
 
 	"github.com/Ayobami6/pickitup/models"
 	"github.com/Ayobami6/pickitup/services/auth"
@@ -29,6 +30,7 @@ func NewOrderHandler(store models.OrderRepo, us models.UserRepo, rs models.Rider
 func (o *orderHandler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/orders/{rider_id}", auth.Auth(o.handleCreateOrder, o.userStore)).Methods("POST")
 	router.HandleFunc("/orders", auth.Auth(o.handleGetOrders, o.userStore)).Methods("GET")
+	router.HandleFunc("/orders/delivery", auth.UserAuth(o.handleConfirmDeliveryStatus, o.riderStore)).Methods("POST")
 	
 }
 
@@ -148,4 +150,31 @@ func (o *orderHandler) handleGetOrders(w http.ResponseWriter, r *http.Request) {
         return
     }
 	utils.WriteJSON(w, http.StatusOK, "success", orders, "Orders retrieved successfully")
+}
+
+
+func (o *orderHandler) handleConfirmDeliveryStatus(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	query := r.URL.Query()
+	orderStatus := query.Get("status")
+	id, err := strconv.Atoi(params["id"])
+	if err!= nil {
+        utils.WriteError(w, http.StatusBadRequest, "Invalid ID")
+        return
+    }
+	orderStatus = string(unicode.ToUpper(rune(orderStatus[0]))) + orderStatus[1:]
+	if orderStatus != "Delivered" {
+		utils.WriteError(w, http.StatusBadRequest, "Invalid order status")
+        return
+    }
+	var orderID uint = uint(id)
+	var convertedOrderStatus models.StatusType = models.StatusType(orderStatus)
+
+	err = o.store.UpdateDeliveryStatus(orderID, convertedOrderStatus)
+	if err!= nil {
+        utils.WriteError(w, http.StatusInternalServerError, "Failed to update order status")
+        return
+    }
+
+	utils.WriteJSON(w, http.StatusOK, "success", nil, "Order Delivery Successfully Confirmed")
 }

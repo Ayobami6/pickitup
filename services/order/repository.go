@@ -50,3 +50,7 @@ func (o *OrderRepoImpl) GetOrders(userID uint)([]dto.OrderResponseDTO, error) {
 
     return orderResponse, nil
 }
+
+func (o *OrderRepoImpl) UpdateDeliveryStatus(orderId uint, status models.StatusType) error {
+	return o.db.Model(&models.Order{}).Where("id =?", orderId).Update("status", status).Error
+}
