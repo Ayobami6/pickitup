@@ -23,3 +23,5 @@
 2024/07/12 19:50:36 main.go:39: failed to connect to `user=ayo database=pickitup_db`:
 	127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
 	[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: cannot assign requested address
+2024/07/12 21:47:55 db.go:15: Database Connected Successfully!
+2024/07/12 21:47:56 api.go:52: Server is running on : localhost:2300

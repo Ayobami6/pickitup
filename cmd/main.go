@@ -38,7 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	addr := "localhost:2300"
+	addr := config.GetEnv("ADDRESS_URL", "localhost:2300")
 	server := api.NewAPIServer(addr, Db)
 
 	if err := server.Run(); err!= nil {
