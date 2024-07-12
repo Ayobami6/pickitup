@@ -28,7 +28,7 @@ func NewUserHandler(repo models.UserRepo, riderRepo models.RiderRepository) *use
 func (h *userHandler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/register", h.handleRegister).Methods("POST")
 	router.HandleFunc("/login", h.handleLogin).Methods("POST")
-	router.HandleFunc("{rider_id}/ratings", auth.RiderAuth(h.handleGiveRatings, h.riderRepo)).Methods("POST")
+	router.HandleFunc("/{rider_id}/ratings", auth.UserAuth(h.handleGiveRatings, h.riderRepo)).Methods("POST")
 }
 
 func (h *userHandler) handleRegister(w http.ResponseWriter, r *http.Request) {

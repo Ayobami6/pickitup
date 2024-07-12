@@ -48,7 +48,7 @@ func (r *userRepoImpl) GetUserByID(id int) (*models.User, error) {
 }
 
 
-func (r *userRepoImpl) CreateRating(review models.Review) error {
+func (r *userRepoImpl) CreateRating(review *models.Review) error {
 	res := r.db.Create(&review)
     if res.Error!= nil {
         return res.Error
