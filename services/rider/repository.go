@@ -161,15 +161,7 @@ func (r *riderRepositoryImpl)UpdateRating(riderID uint)(error){
     if res.Error!= nil {
         return res.Error
     }
-
-    // send notification to all users who rated the rider
-    // sendNotificationToRaterUsers(riderID, newRating)
-    // send notification to all users who requested rides from the rider
-    // sendNotification
-	
-
     return  nil
-	// 
 }
 
 func (r *riderRepositoryImpl)UpdateMinAndMaxCharge(minCharge float64, maxCharge float64, userID uint) (error) {

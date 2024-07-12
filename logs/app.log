@@ -16,3 +16,10 @@
 2024/07/12 16:54:06 jwt.go:187: 5
 2024/07/12 16:55:57 db.go:15: Database Connected Successfully!
 2024/07/12 16:55:58 api.go:52: Server is running on : localhost:2300
+2024/07/12 17:26:39 db.go:15: Database Connected Successfully!
+2024/07/12 17:26:40 api.go:52: Server is running on : localhost:2300
+2024/07/12 20:42:22 db.go:15: Database Connected Successfully!
+2024/07/12 20:42:23 api.go:52: Server is running on : localhost:2300
+2024/07/12 19:50:36 main.go:39: failed to connect to `user=ayo database=pickitup_db`:
+	127.0.0.1:5432 (localhost): dial error: dial tcp 127.0.0.1:5432: connect: connection refused
+	[::1]:5432 (localhost): dial error: dial tcp [::1]:5432: connect: cannot assign requested address
