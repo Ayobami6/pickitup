@@ -69,14 +69,23 @@ func (r *riderRepositoryImpl) GetRider(id int, req *http.Request) (dto.RiderResp
 	var selfUrl = fmt.Sprintf("%s/riders/%d", domain, rider.ID)
 
     var reviewResponse []dto.ReviewResponse
-
-    for _, review := range rider.Reviews {
-        reviewResponse = append(reviewResponse, dto.ReviewResponse{
-            Rating: review.Rating,
-            Comment: review.Comment,
-        })
+    reviews, err := r.GetRiderReviews(uint(id))
+    if err!= nil {
+        log.Println(err)
     }
-    
+
+    if reviews != nil {
+        for _, review := range reviews {
+            reviewResponse = append(reviewResponse, dto.ReviewResponse{
+                Rating: review.Rating,
+                Comment: review.Comment,
+            })
+        }
+
+    } else {
+        reviewResponse = []dto.ReviewResponse{}
+
+    }
 	response := dto.RiderResponse{
 		ID: rider.ID,
         FirstName: rider.FirstName,
@@ -169,6 +178,13 @@ func (r *riderRepositoryImpl)UpdateMinAndMaxCharge(minCharge float64, maxCharge 
         return res.Error
     }
     return nil
+}
 
-
+func (r *riderRepositoryImpl) GetRiderReviews(riderID uint) ([]models.Review, error) {
+    var reviews []models.Review
+    res := r.db.Where(&models.Review{RiderID: riderID}).Find(&reviews)
+    if res.Error!= nil {
+        return nil, res.Error
+    }
+    return reviews, nil
 }

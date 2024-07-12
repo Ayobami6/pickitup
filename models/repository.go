@@ -15,6 +15,7 @@ type RiderRepository interface {
 	GetRiderByID(id uint)(*Rider, error)
 	UpdateRating(riderId uint) (error)
 	UpdateMinAndMaxCharge(minCharge float64, maxCharge float64, userID uint) (error)
+	GetRiderReviews(rideId uint)([]Review, error)
 }
 
 type UserRepo interface {
