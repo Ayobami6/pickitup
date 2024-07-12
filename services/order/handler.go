@@ -176,6 +176,8 @@ func (o *orderHandler) handleConfirmDeliveryStatus(w http.ResponseWriter, r *htt
         utils.WriteError(w, http.StatusInternalServerError, "Failed to update order status")
         return
     }
+	// TODO: add charge amount to rider wallet
+
 	// TODO: add email notification
 
 	utils.WriteJSON(w, http.StatusOK, "success", nil, "Order Delivery Successfully Confirmed")
@@ -219,12 +221,8 @@ func (o *orderHandler) handleAcknowledge(w http.ResponseWriter, r *http.Request)
 	riderMessage := fmt.Sprintf("You have successfully acknowledged pickup order %s\n Once delivered your wallet will be automatically funded with the charge amount .\n Do make sure to ask your client to confirm your delivery before you leave", order.RefID)
 	userMessage := fmt.Sprintf("Your Pickup Order %s has been acknowledged.\n Please refer to your previous email for your rider phone number so as to monitor .\n Please make sure to confirm your order delivery on your dashboard once your items has been delivered", order.RefID)
 	subject := "PickItUp Order Acknowledgement"
-	// TODO: add email notification
 	go utils.SendMail(user.Email, subject, user.UserName, userMessage)
     go utils.SendMail(riderUser.Email, subject, riderUser.UserName, riderMessage)
 
 	utils.WriteJSON(w, http.StatusOK, "success", nil, "Order Successfully Acknowledged!")
-
-
-
 }
