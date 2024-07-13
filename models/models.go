@@ -59,6 +59,12 @@ func (u *User) Debit(tx *gorm.DB, amount float64) error  {
 
 }
 
+func (u *User) Credit(tx *gorm.DB, amount float64) error {
+	// fund user wallet
+	u.WalletBalance = u.WalletBalance + amount
+	return tx.Save(u).Error
+}
+
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
@@ -104,6 +110,11 @@ func (u *Rider) BeforeCreate(tx *gorm.DB) (err error) {
 	u.CreatedAt = time.Now()
     u.UpdatedAt = time.Now()
     return nil
+}
+
+func (r *Rider)UpdateSuccessfulRides(tx *gorm.DB) error {
+	r.SuccessfulRides++
+    return tx.Save(r).Error
 }
 
 func (r *Rider) BeforeUpdate(tx *gorm.DB) (err error) {
