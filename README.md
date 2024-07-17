@@ -402,3 +402,28 @@ func (o *orderHandler) handleAcknowledge(w http.ResponseWriter, r *http.Request)
 	utils.WriteJSON(w, http.StatusOK, "success", nil, "Order Successfully Acknowledged!")
 }
 ```
+
+
+
+All above are the basic **MVP Implementation For The PickItUp Business** Backend version 1 with some deliberately left features to be implemented in the V2 of the application such as;
+- Email Verification endpoint
+- Resend Email Verification Code
+- Persistent Email Notification
+- Add funds to wallet endpoint
+- Cancel pending pickup order
+- Users add riders to favorites list
+- Limit users to one review per rider
+
+To be implemented in version 2.0.
+
+### Why Version 2?
+- Scalability
+- Orthogonality
+- Flexibility
+- Easy Maintainability
+
+Right Now our v1 application might be scalable enough for small scale or medium scale business, but we have a vision of making the application a nationwide and eventually worldwide application, hence we need an application that can easily accommodate the growth. Thus we need to upgrade our system to distributed systems using microservices architecture.
+
+### Our Distributed System Architecture Overview
+
+![img](assets/pickitup_v2.drawio.png)
