@@ -26,8 +26,8 @@ var Validate = validator.New()
 
 func init() {
 	rdb = redis.NewClient(&redis.Options{
-		Addr:     config.GetEnv("REDIS_URL", "localhost:6379"),        
-		DB:       0,               
+		Addr:     config.GetEnv("REDIS_URL", "localhost:6379"),
+        DB:       0,
 	})
 }
 
