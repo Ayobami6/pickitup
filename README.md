@@ -435,5 +435,7 @@ Right Now our v1 application might be scalable enough for small scale or medium 
 
 ![img](assets/pickitup_v2.drawio.png)
 
+Version 1 live url [link](https://pickitup.onrender.com/api/v1)
+Docs Page [link](https://documenter.getpostman.com/view/35174244/2sA3kVk1pv)
 
 Checkout the Distributed system [here](https://github.com/Ayobami6/pickitup_v2)
