@@ -91,7 +91,7 @@ func (o *orderHandler) handleCreateOrder(w http.ResponseWriter, r *http.Request)
         return
 	}
 
-	if bal := user.WalletBalance; bal <= charge {
+	if bal := user.WalletBalance; bal < charge {
 		utils.WriteError(w, http.StatusBadRequest, "Insufficient balance")
         return
 	}
