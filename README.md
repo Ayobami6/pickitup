@@ -5,6 +5,13 @@ This codebase contains all MVP business logic design, functionality and system d
 
 ![img](assets/pickitup.drawio.png)
 
+## Tools Used
+- Go
+- Gorilla Mux
+- Goroutines
+- Docker/Docker Compose
+- PostgreSQL
+- Redis
 
 ## Pickitup V1 Available Endpoints and Their Business Logic Description
 
@@ -427,3 +434,6 @@ Right Now our v1 application might be scalable enough for small scale or medium 
 ### Our Distributed System Architecture Overview
 
 ![img](assets/pickitup_v2.drawio.png)
+
+
+Checkout the Distributed system [here](https://github.com/Ayobami6/pickitup_v2)
