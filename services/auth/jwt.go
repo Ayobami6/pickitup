@@ -85,7 +85,7 @@ func RiderAuth(handlerFunc http.HandlerFunc, riderStore models.RiderRepository) 
 			Forbidden(w)
 			return
 		}
-		if rider.ID == 0 {
+		if rider.UserID == 0 {
 			Forbidden(w)
 			return
 		}

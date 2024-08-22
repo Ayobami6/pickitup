@@ -12,7 +12,7 @@ services:
       - /app/tmp
     ports:
       - 2400:2400
-    command: ["ls", "tmp/"]
+    command: ["./app"]
     depends_on:
       - redis
 

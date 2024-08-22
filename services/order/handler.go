@@ -91,7 +91,7 @@ func (o *orderHandler) handleCreateOrder(w http.ResponseWriter, r *http.Request)
         return
 	}
 
-	if bal := user.WalletBalance; bal <= charge {
+	if bal := user.WalletBalance; bal < charge {
 		utils.WriteError(w, http.StatusBadRequest, "Insufficient balance")
         return
 	}
@@ -206,7 +206,7 @@ func (o *orderHandler) handleConfirmDeliveryStatus(w http.ResponseWriter, r *htt
     }
 
     // TODO: add email notification
-	message := fmt.Sprintf("Your order delivery has been successful confirmed. ₦%.1f has been added to your wallet", chargeAmount)
+	message := fmt.Sprintf("Your order delivery has been successfully confirmed. ₦%.1f has been added to your wallet", chargeAmount)
 	subject := "Order Delivery Notification"
 
 	go utils.SendMail(riderUser.Email, subject, riderUser.UserName, message)
