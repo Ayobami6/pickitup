@@ -31,7 +31,7 @@ func main() {
 	user := config.GetEnv("DB_USER", "ayo")
 	pwd := config.GetEnv("DB_PWD", "password")
 	dbName := config.GetEnv("DB_NAME", "pickitup_db")
-	sslmode := "disable"
+	sslmode := "require"
     timeZone := "Africa/Lagos"
 	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s Timezone=%s", user, pwd, dbName, host, port, sslmode, timeZone)
 	Db, err := db.ConnectDb(dsn)
